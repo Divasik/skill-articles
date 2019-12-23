@@ -138,8 +138,12 @@ class RootActivity : AppCompatActivity() {
         btn_like.isChecked = data.isLike
         btn_bookmark.isChecked = data.isBookmark
         btn_settings.isChecked = data.isShowMenu
-
-        delegate.localNightMode = if(data.isDarkMode) AppCompatDelegate.MODE_NIGHT_YES else AppCompatDelegate.MODE_NIGHT_NO
+        
+        if(data.isDarkMode && delegate.localNightMode != AppCompatDelegate.MODE_NIGHT_YES) {
+            delegate.localNightMode = AppCompatDelegate.MODE_NIGHT_YES
+        } else if(!data.isDarkMode && delegate.localNightMode != AppCompatDelegate.MODE_NIGHT_NO) {
+            delegate.localNightMode = AppCompatDelegate.MODE_NIGHT_NO
+        }
     }
 
     private fun setupToolbar() {
