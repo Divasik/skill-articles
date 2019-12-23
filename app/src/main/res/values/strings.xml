@@ -1,0 +1,5 @@
+<resources>
+    <string name="app_name">Skill Articles</string>
+    <string name="search">Поиск</string>
+    <string name="hintSearch">Поиск</string>
+</resources>
