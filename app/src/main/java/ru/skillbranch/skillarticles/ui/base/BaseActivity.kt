@@ -8,9 +8,9 @@ import ru.skillbranch.skillarticles.viewmodels.base.Notify
 
 abstract class BaseActivity<T : BaseViewModel<out IViewModelState>> : AppCompatActivity() {
 
-    protected abstract val viewModel: T
-    protected abstract val layout: Int
-    protected abstract val binding: Binding
+    abstract val viewModel: T
+    abstract val layout: Int
+    abstract val binding: Binding
 
     abstract fun setupViews()
     abstract fun renderNotification(notify: Notify)
