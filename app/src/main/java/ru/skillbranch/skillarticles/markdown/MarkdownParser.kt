@@ -16,12 +16,13 @@ object MarkdownParser {
     private const val RULE_GROUP = "(^[-_*]{3}$)"
     private const val INLINE_GROUP = "((?<!`)`[^`\\s].*?[^`\\s]?`(?!`))"
     private const val LINK_GROUP = "(\\[[^\\[\\]]*?]\\(.+?\\)|^\\[*?]\\(.*?\\))"
-    private const val BLOCK_CODE_GROUP = ""
-    private const val ORDER_LIST_GROUP = ""
+    private const val BLOCK_CODE_GROUP = "(^`{3}[\\s\\S]+?`{3}$)"
+    private const val ORDER_LIST_GROUP = "(^[\\d]. .+$)"
 
     //result regex
-    private const val MARKDOWN_GROUPS = "$UNORDERED_LIST_ITEM_GROUP|$HEADER_GROUP|$QUOTE_GROUP|$ITALIC_GROUP|$BOLD_GROUP|$STRIKE_GROUP|$RULE_GROUP|$INLINE_GROUP|$LINK_GROUP"
-    //|$BLOCK_CODE_GROUP|$ORDER_LIST_GROUP optionally
+    private const val MARKDOWN_GROUPS = "$UNORDERED_LIST_ITEM_GROUP|$HEADER_GROUP|$QUOTE_GROUP|" +
+            "$ITALIC_GROUP|$BOLD_GROUP|$STRIKE_GROUP|$RULE_GROUP|$INLINE_GROUP|$LINK_GROUP|" +
+            "$BLOCK_CODE_GROUP|$ORDER_LIST_GROUP"
 
     private val elementsPattern by lazy { Pattern.compile(MARKDOWN_GROUPS, Pattern.MULTILINE) }
 
@@ -60,7 +61,7 @@ object MarkdownParser {
             var text: CharSequence
 
             //groups range for iterate by groups (1..9) or (1..11) optionally
-            val groups = 1..9
+            val groups = 1..11
             var group = -1
             for (gr in groups) {
                 if(matcher.group(gr) != null) {
@@ -178,12 +179,41 @@ object MarkdownParser {
                 }
                 //10 -> BLOCK CODE - optionally
                 10 -> {
-                    //TODO implement me
+                    text = string.subSequence(startIndex, endIndex)
+
+                    if(!text.contains("\n")) {
+                        val element = Element.BlockCode(Element.BlockCode.Type.SINGLE, text.subSequence(3, text.length-3))
+                        parents.add(element)
+                    } else {
+                        val startRegex = "^`{3}".toRegex()
+                        val endRegex = "`{3}$".toRegex()
+                        text.split("\n").forEach {
+                            val element = when {
+                                startRegex.find(it) != null -> {
+                                    Element.BlockCode(Element.BlockCode.Type.START, it.substring(3) + "\n")
+                                }
+                                endRegex.find(it) != null -> {
+                                    Element.BlockCode(Element.BlockCode.Type.END, it.substring(0, it.length - 3))
+                                }
+                                else -> Element.BlockCode(Element.BlockCode.Type.MIDDLE, it + "\n")
+                            }
+                            parents.add(element)
+                        }
+                    }
+
+                    lastStartIndex = endIndex
                 }
 
                 //11 -> NUMERIC LIST
                 11 -> {
-                    //TODO implement me
+                    val order = "^[\\d]".toRegex().find(string.subSequence(startIndex, endIndex))
+
+                    text = string.subSequence(startIndex + order!!.value.length + 2, endIndex)
+
+                    val element = Element.OrderedListItem(order!!.value, text)
+                    parents.add(element)
+
+                    lastStartIndex = endIndex
                 }
             }
 
@@ -212,7 +242,7 @@ object MarkdownParser {
             var text: CharSequence
 
             //groups range for iterate by groups (1..9) or (1..11) optionally
-            val groups = 1..9
+            val groups = 1..11
             var group = -1
             for (gr in groups) {
                 if(matcher.group(gr) != null) {
@@ -318,12 +348,17 @@ object MarkdownParser {
                 }
                 //10 -> BLOCK CODE - optionally
                 10 -> {
-                    //TODO implement me
+                    text = string.subSequence(startIndex+3, endIndex-3)
+                    builder.append(text)
+                    lastStartIndex = endIndex
                 }
 
                 //11 -> NUMERIC LIST
                 11 -> {
-                    //TODO implement me
+                    val order = "^[\\d]".toRegex().find(string.subSequence(startIndex, endIndex))
+                    text = string.subSequence(startIndex + order!!.value.length + 2, endIndex)
+                    builder.append(text)
+                    lastStartIndex = endIndex
                 }
             }
 

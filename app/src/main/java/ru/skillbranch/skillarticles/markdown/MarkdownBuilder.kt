@@ -78,6 +78,16 @@ class MarkdownBuilder(context: Context) {
                         append(element.text)
                     }
                 }
+                is Element.BlockCode -> {
+                    inSpans(BlockCodeSpan(colorPrimary, colorSurface, cornerRadius, gap, element.type)){
+                        append(element.text)
+                    }
+                }
+                is Element.OrderedListItem -> {
+                    inSpans(OrderedListSpan(gap, element.order, colorPrimary)) {
+                        append(element.text)
+                    }
+                }
                 else -> append(element.text)
             }
         }
