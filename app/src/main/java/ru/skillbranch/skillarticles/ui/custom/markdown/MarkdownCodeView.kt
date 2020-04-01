@@ -29,7 +29,7 @@ class MarkdownCodeView private constructor(
 
     override var fontSize: Float = fontSize
         set(value) {
-            tv_codeView.textSize = value * 0.85f
+            tv_codeView.textSize = value * 0.75f
             field = value
         }
 
