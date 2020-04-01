@@ -29,7 +29,7 @@ class MarkdownCodeView private constructor(
 
     override var fontSize: Float = fontSize
         set(value) {
-            tv_codeView.textSize = value * 0.75f
+            tv_codeView.textSize = value * 0.85f
             field = value
         }
 
@@ -86,7 +86,7 @@ class MarkdownCodeView private constructor(
         }
 
     init {
-        tv_codeView = MarkdownTextView(context, fontSize).apply {
+        tv_codeView = MarkdownTextView(context, fontSize * 0.85f).apply {
             typeface = Typeface.create(Typeface.MONOSPACE, Typeface.NORMAL)
             setTextColor(textColor)
             setPaddingOptionally(right = textExtraPadding)
