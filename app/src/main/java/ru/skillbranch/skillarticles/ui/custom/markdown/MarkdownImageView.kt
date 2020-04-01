@@ -124,7 +124,7 @@ class MarkdownImageView private constructor(
                 setBackgroundColor(ColorUtils.setAlphaComponent(colorSurface, 160))
                 gravity = Gravity.CENTER
                 textSize = fontSize
-                setPadding(titlePadding)
+                setPadding(titleTopMargin)
                 isVisible = false
             }
             addView(tv_alt)
