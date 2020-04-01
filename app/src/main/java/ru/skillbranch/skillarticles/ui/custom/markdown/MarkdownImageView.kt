@@ -35,7 +35,7 @@ class MarkdownImageView private constructor(
 
     override var fontSize: Float = fontSize
         set(value) {
-            tv_title.textSize = value * 0.85f
+            tv_title.textSize = value * 0.75f
             tv_alt?.textSize = value
             field = value
         }
@@ -92,7 +92,7 @@ class MarkdownImageView private constructor(
         }
         addView(iv_image)
 
-        tv_title = MarkdownTextView(context, fontSize * 0.85f).apply {
+        tv_title = MarkdownTextView(context, fontSize * 0.75f).apply {
             setTextColor(colorOnBackground)
             gravity = Gravity.CENTER
             typeface = Typeface.create(Typeface.MONOSPACE, Typeface.NORMAL)
