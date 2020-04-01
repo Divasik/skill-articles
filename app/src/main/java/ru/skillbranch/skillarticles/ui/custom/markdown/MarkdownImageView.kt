@@ -49,9 +49,9 @@ class MarkdownImageView private constructor(
     private lateinit var imageTitle: CharSequence
 
     @VisibleForTesting(otherwise = VisibleForTesting.PRIVATE)
-    val iv_image: ImageView = ImageView(context)
+    val iv_image: ImageView
     @VisibleForTesting(otherwise = VisibleForTesting.PRIVATE)
-    val tv_title: MarkdownTextView = MarkdownTextView(context, fontSize * 0.85f)
+    val tv_title: MarkdownTextView
     @VisibleForTesting(otherwise = VisibleForTesting.PRIVATE)
     var tv_alt: TextView? = null
 
@@ -78,9 +78,9 @@ class MarkdownImageView private constructor(
     }
 
     init {
-        layoutParams = LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT)
+        layoutParams = LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT)
 
-        iv_image.apply {
+        iv_image = ImageView(context).apply {
             outlineProvider = object: ViewOutlineProvider() {
                 override fun getOutline(view: View, outline: Outline) {
                     outline.setRoundRect(
@@ -93,8 +93,7 @@ class MarkdownImageView private constructor(
         }
         addView(iv_image)
 
-        tv_title.apply {
-            setText("title", TextView.BufferType.SPANNABLE)
+        tv_title = MarkdownTextView(context, fontSize * 0.85f).apply {
             setTextColor(colorOnBackground)
             gravity = Gravity.CENTER
             typeface = Typeface.create(Typeface.MONOSPACE, Typeface.NORMAL)
@@ -134,7 +133,7 @@ class MarkdownImageView private constructor(
 
         iv_image.setOnClickListener {
             if(tv_alt?.isVisible == true) animateHideAlt()
-            else animateHideAlt()
+            else animateShowAlt()
         }
     }
 
