@@ -183,7 +183,7 @@ class RootActivity : BaseActivity<ArticleViewModel>(), IArticleView {
         tv_text_content.setCopyListener {  copy ->
             val clipboard = getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
             val clip = ClipData.newPlainText("Copied data", copy)
-            clipboard.primaryClip = clip
+            clipboard.setPrimaryClip(clip)
             viewModel.handleCopyCode()
         }
     }
