@@ -1,11 +1,15 @@
 package ru.skillbranch.skillarticles.viewmodels
 
 import android.os.Bundle
+import android.util.Log
 import androidx.core.os.bundleOf
 import androidx.lifecycle.LiveData
 import ru.skillbranch.skillarticles.data.ArticleData
 import ru.skillbranch.skillarticles.data.ArticlePersonalInfo
 import ru.skillbranch.skillarticles.data.repositories.ArticleRepository
+import ru.skillbranch.skillarticles.data.repositories.MarkdownElement
+import ru.skillbranch.skillarticles.data.repositories.MarkdownParser
+import ru.skillbranch.skillarticles.data.repositories.clearContent
 import ru.skillbranch.skillarticles.extensions.data.toAppSettings
 import ru.skillbranch.skillarticles.extensions.data.toArticlePersonalInfo
 import ru.skillbranch.skillarticles.extensions.format
@@ -17,6 +21,7 @@ import ru.skillbranch.skillarticles.viewmodels.base.Notify
 class ArticleViewModel(private val articleId: String) : BaseViewModel<ArticleState>(ArticleState()), IArticleViewModel {
 
     private val repository = ArticleRepository
+    private var clearContent: String? = null
 
     init {
         subscribeOnDataSource(getArticleData()) { article, state ->
@@ -56,7 +61,7 @@ class ArticleViewModel(private val articleId: String) : BaseViewModel<ArticleSta
         }
     }
 
-    override fun getArticleContent(): LiveData<String?> {
+    override fun getArticleContent(): LiveData<List<MarkdownElement>?> {
         return repository.loadArticleContent(articleId)
     }
 
@@ -127,7 +132,10 @@ class ArticleViewModel(private val articleId: String) : BaseViewModel<ArticleSta
 
     override fun handleSearch(query: String?) {
         query ?: return
-        val result = currentState.content
+        if(clearContent == null && currentState.content.isNotEmpty()) {
+            clearContent = currentState.content.clearContent()
+        }
+        val result = clearContent
                 .indexesOf(query)
                 .map { it to it + query.length }
         updateState { it.copy(searchQuery = query, searchResults = result, searchPosition = 0) }
@@ -139,6 +147,10 @@ class ArticleViewModel(private val articleId: String) : BaseViewModel<ArticleSta
 
     fun handleDownResult() {
         updateState { it.copy(searchPosition = it.searchPosition.inc()) }
+    }
+
+    fun handleCopyCode() {
+        notify(Notify.TextMessage("Code copy to clipboard"))
     }
 
 }
@@ -164,7 +176,7 @@ data class ArticleState(
         val date: String? = null,
         val author: Any? = null,
         val poster: String? = null,
-        val content: String? = null,
+        val content: List<MarkdownElement> = emptyList(),
         val reviews: List<Any> = emptyList()
 ): IViewModelState {
 
