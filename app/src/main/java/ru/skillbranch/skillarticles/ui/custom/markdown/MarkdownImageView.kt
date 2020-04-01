@@ -3,7 +3,6 @@ package ru.skillbranch.skillarticles.ui.custom.markdown
 import android.annotation.SuppressLint
 import android.content.Context
 import android.graphics.*
-import android.text.Layout
 import android.text.Spannable
 import android.view.*
 import android.widget.ImageView
@@ -84,7 +83,7 @@ class MarkdownImageView private constructor(
             outlineProvider = object: ViewOutlineProvider() {
                 override fun getOutline(view: View, outline: Outline) {
                     outline.setRoundRect(
-                            Rect(0, 0, view.measuredHeight, view.measuredHeight),
+                            Rect(0, 0, view.measuredWidth, view.measuredHeight),
                             cornerRadius
                     )
                 }
