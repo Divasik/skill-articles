@@ -135,8 +135,6 @@ class MarkdownCodeView private constructor(
         code: CharSequence
     ) : this(context, fontSize) {
 
-        id = code.hashCode()
-
         codeString = code
         isSingleLine = code.lines().size == 1
         tv_codeView.setText(codeString, TextView.BufferType.SPANNABLE)
