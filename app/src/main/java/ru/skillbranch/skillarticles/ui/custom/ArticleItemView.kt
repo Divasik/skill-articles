@@ -136,7 +136,10 @@ class ArticleItemView(context: Context) : ViewGroup(context) {
         val width = View.getDefaultSize(suggestedMinimumWidth, widthMeasureSpec)
 
         measureChild(tv_date, widthMeasureSpec, heightMeasureSpec)
-        measureChild(tv_author, widthMeasureSpec, heightMeasureSpec)
+
+        val authorWidth = width - paddingLeft - paddingRight - tv_date.measuredWidth - authorMarginL
+        val authorWidthMs = MeasureSpec.makeMeasureSpec(authorWidth, MeasureSpec.EXACTLY)
+        tv_author.measure(authorWidthMs, heightMeasureSpec)
         usedHeight += max(tv_date.measuredHeight, tv_author.measuredHeight)
 
         val titleWidth = width - posterSize - titleMarginR - paddingLeft - paddingRight
