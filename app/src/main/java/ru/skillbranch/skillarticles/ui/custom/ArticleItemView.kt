@@ -58,6 +58,7 @@ class ArticleItemView(context: Context) : ViewGroup(context) {
         addView(tv_date)
 
         tv_author = TextView(context).apply {
+            id = R.id.tv_author
             setTextColor(context.attrValue(R.attr.colorPrimary))
             textSize = 12f
         }
