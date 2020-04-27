@@ -4,8 +4,6 @@ import android.os.Bundle
 import androidx.activity.viewModels
 import androidx.navigation.ui.AppBarConfiguration
 import androidx.navigation.ui.setupActionBarWithNavController
-import androidx.navigation.ui.setupWithNavController
-import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.android.material.snackbar.Snackbar
 import kotlinx.android.synthetic.main.activity_root.*
 import kotlinx.android.synthetic.main.layout_bottombar.*
@@ -44,7 +42,12 @@ class RootActivity : BaseActivity<RootViewModel>() {
         }
 
         navController.addOnDestinationChangedListener { controller, destination, args ->
-            nav_view.selectDestination(destination)
+            if(destination.id == R.id.nav_auth && viewModel.currentState.isAuth) {
+                navController.popBackStack()
+                viewModel.navigate(NavigationCommand.To(R.id.nav_profile))
+            } else {
+                nav_view.selectDestination(destination)
+            }
         }
     }
 
