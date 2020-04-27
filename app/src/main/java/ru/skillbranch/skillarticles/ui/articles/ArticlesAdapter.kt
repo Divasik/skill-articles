@@ -15,11 +15,12 @@ import ru.skillbranch.skillarticles.R
 import ru.skillbranch.skillarticles.data.ArticleItemData
 import ru.skillbranch.skillarticles.extensions.dpToIntPx
 import ru.skillbranch.skillarticles.extensions.format
+import ru.skillbranch.skillarticles.ui.custom.ArticleItemView
 
 class ArticlesAdapter(private val listener: (ArticleItemData) -> Unit) : ListAdapter<ArticleItemData, ArticleVH>(ArticleDiffCallback()) {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ArticleVH {
-        val view = LayoutInflater.from(parent.context).inflate(R.layout.item_article, parent, false)
+        val view = ArticleItemView(parent.context) //LayoutInflater.from(parent.context).inflate(R.layout.item_article, parent, false)
         return ArticleVH(view)
     }
 
@@ -42,7 +43,9 @@ class ArticleDiffCallback: DiffUtil.ItemCallback<ArticleItemData>() {
 class ArticleVH(override val containerView: View) : RecyclerView.ViewHolder(containerView), LayoutContainer {
 
     fun bind(item: ArticleItemData, listener: (ArticleItemData) -> Unit) {
-        val categorySize = containerView.context.dpToIntPx(64)
+        (itemView as ArticleItemView).bind(item)
+
+        /*val categorySize = containerView.context.dpToIntPx(64)
         val cornerSize = containerView.context.dpToIntPx(8)
         val avatarSize = containerView.context.dpToIntPx(8)
 
@@ -64,7 +67,7 @@ class ArticleVH(override val containerView: View) : RecyclerView.ViewHolder(cont
         tv_description.text = item.description
         tv_likes_count.text = "${item.likeCount}"
         tv_comments_count.text = "${item.commentCount}"
-        tv_read_duration.text = "${item.readDuration} min read"
+        tv_read_duration.text = "${item.readDuration} min read"*/
 
         itemView.setOnClickListener { listener(item) }
     }
