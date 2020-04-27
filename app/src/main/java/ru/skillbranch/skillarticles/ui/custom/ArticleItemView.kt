@@ -187,7 +187,7 @@ class ArticleItemView(context: Context) : ViewGroup(context) {
                 left, usedHeight + titleDy,
                 left + tv_title.measuredWidth, usedHeight + titleDy + tv_title.measuredHeight
         )
-        val posterDy = ((rowH - posterSize - posterMarginT - posterMarginB) / 2f).toInt()
+        val posterDy = 0// ((rowH - posterSize - posterMarginT - posterMarginB) / 2f).toInt()
         iv_poster.layout(
                 right - posterSize, usedHeight + posterMarginT + posterDy,
                 right, usedHeight + posterMarginT + posterDy + posterSize
