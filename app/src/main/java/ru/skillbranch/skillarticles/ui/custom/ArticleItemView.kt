@@ -201,7 +201,6 @@ class ArticleItemView(context: Context) : ViewGroup(context) {
                 right - posterSize + categorySize2, usedHeight + posterMarginT + posterDy + posterSize + categorySize2
         )
         usedHeight += rowH
-        usedHeight += descrMarginVert
 
         tv_description.layout(
                 left, usedHeight,
