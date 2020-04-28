@@ -2,6 +2,7 @@ package ru.skillbranch.skillarticles.ui.custom
 
 import android.content.Context
 import android.graphics.Typeface
+import android.util.Log
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
@@ -68,7 +69,7 @@ class ArticleItemView(context: Context) : ViewGroup(context) {
             id = R.id.tv_title
             setTextColor(context.attrValue(R.attr.colorPrimary))
             textSize = 18f
-            //typeface = Typeface.create(Typeface.DEFAULT, Typeface.BOLD)
+            typeface = Typeface.create(Typeface.DEFAULT, Typeface.BOLD)
         }
         addView(tv_title)
 
@@ -146,6 +147,9 @@ class ArticleItemView(context: Context) : ViewGroup(context) {
         val titleWidthMs = MeasureSpec.makeMeasureSpec(titleWidth, MeasureSpec.EXACTLY)
         tv_title.measure(titleWidthMs, heightMeasureSpec)
         usedHeight += max(tv_title.measuredHeight + 2*titleMarginVert, posterSize + posterMarginT + posterMarginB)
+
+        measureChild(iv_poster, widthMeasureSpec, heightMeasureSpec)
+        measureChild(iv_category, widthMeasureSpec, heightMeasureSpec)
 
         measureChild(tv_description, widthMeasureSpec, heightMeasureSpec)
         usedHeight += tv_description.measuredHeight
@@ -238,6 +242,9 @@ class ArticleItemView(context: Context) : ViewGroup(context) {
         iv_bookmark.layout(
                 rowL, usedHeight, rowL + iconSize, usedHeight + iconSize
         )
+
+        /*Log.d("VHVH", "authorY: ${tv_author.top} ${tv_author.bottom} ${tv_author.measuredHeight} " +
+                "posterY: ${iv_poster.top} ${iv_poster.bottom} ${iv_poster.measuredHeight}")*/
     }
 
     fun bind(item: ArticleItemData) {

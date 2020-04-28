@@ -1,5 +1,7 @@
 package ru.skillbranch.skillarticles.ui.articles
 
+import android.graphics.Rect
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -20,7 +22,7 @@ import ru.skillbranch.skillarticles.ui.custom.ArticleItemView
 class ArticlesAdapter(private val listener: (ArticleItemData) -> Unit) : ListAdapter<ArticleItemData, ArticleVH>(ArticleDiffCallback()) {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ArticleVH {
-        val view = ArticleItemView(parent.context) //LayoutInflater.from(parent.context).inflate(R.layout.item_article, parent, false)
+        val view = ArticleItemView(parent.context)// LayoutInflater.from(parent.context).inflate(R.layout.item_article, parent, false)
         return ArticleVH(view)
     }
 
@@ -45,14 +47,14 @@ class ArticleVH(override val containerView: View) : RecyclerView.ViewHolder(cont
     fun bind(item: ArticleItemData, listener: (ArticleItemData) -> Unit) {
         (itemView as ArticleItemView).bind(item)
 
-        /*val categorySize = containerView.context.dpToIntPx(64)
+        /*val posterSize = containerView.context.dpToIntPx(64)
         val cornerSize = containerView.context.dpToIntPx(8)
-        val avatarSize = containerView.context.dpToIntPx(8)
+        val categorySize = containerView.context.dpToIntPx(40)
 
         Glide.with(containerView.context)
                 .load(item.poster)
                 .transform(CenterCrop(), RoundedCorners(cornerSize))
-                .override(categorySize)
+                .override(posterSize)
                 .into(iv_poster)
 
         Glide.with(containerView.context)
@@ -67,7 +69,11 @@ class ArticleVH(override val containerView: View) : RecyclerView.ViewHolder(cont
         tv_description.text = item.description
         tv_likes_count.text = "${item.likeCount}"
         tv_comments_count.text = "${item.commentCount}"
-        tv_read_duration.text = "${item.readDuration} min read"*/
+        tv_read_duration.text = "${item.readDuration} min read"
+
+        itemView.invalidate()
+
+        Log.d("VHVH", "authorY: ${tv_author.top} ${tv_author.bottom} posterY: ${iv_poster.top} ${iv_poster.bottom}")*/
 
         itemView.setOnClickListener { listener(item) }
     }
