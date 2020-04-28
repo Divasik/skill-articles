@@ -68,7 +68,7 @@ class ArticleItemView(context: Context) : ViewGroup(context) {
             id = R.id.tv_title
             setTextColor(context.attrValue(R.attr.colorPrimary))
             textSize = 18f
-            typeface = Typeface.create(Typeface.DEFAULT, Typeface.BOLD)
+            //typeface = Typeface.create(Typeface.DEFAULT, Typeface.BOLD)
         }
         addView(tv_title)
 
@@ -187,7 +187,7 @@ class ArticleItemView(context: Context) : ViewGroup(context) {
                 left, usedHeight + titleDy,
                 left + tv_title.measuredWidth, usedHeight + titleDy + tv_title.measuredHeight
         )
-        val posterDy = 0// ((rowH - posterSize - posterMarginT - posterMarginB) / 2f).toInt()
+        val posterDy = ((rowH - posterSize - posterMarginT - posterMarginB) / 2f).toInt()
         iv_poster.layout(
                 right - posterSize, usedHeight + posterMarginT + posterDy,
                 right, usedHeight + posterMarginT + posterDy + posterSize
