@@ -35,6 +35,7 @@ class ArticleItemView(context: Context) : ViewGroup(context) {
     val iv_bookmark: ImageView
 
     private val padding = context.dpToIntPx(16)
+    private val paddingB = context.dpToIntPx(8)
     private val iconSize = context.dpToIntPx(16)
     private val authorMarginL = context.dpToIntPx(16)
     private val titleMarginR = context.dpToIntPx(24)
@@ -148,9 +149,6 @@ class ArticleItemView(context: Context) : ViewGroup(context) {
         tv_title.measure(titleWidthMs, heightMeasureSpec)
         usedHeight += max(tv_title.measuredHeight + 2*titleMarginVert, posterSize + posterMarginT + posterMarginB)
 
-        measureChild(iv_poster, widthMeasureSpec, heightMeasureSpec)
-        measureChild(iv_category, widthMeasureSpec, heightMeasureSpec)
-
         measureChild(tv_description, widthMeasureSpec, heightMeasureSpec)
         usedHeight += tv_description.measuredHeight
         usedHeight += 2*descrMarginVert
@@ -164,7 +162,7 @@ class ArticleItemView(context: Context) : ViewGroup(context) {
         tv_read_duration.measure(durationWidthMs, heightMeasureSpec)
 
         usedHeight += tv_read_duration.measuredHeight
-        usedHeight += paddingBottom
+        usedHeight += paddingB
 
         setMeasuredDimension(width, usedHeight)
     }
