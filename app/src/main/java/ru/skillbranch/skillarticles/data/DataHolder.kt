@@ -70,7 +70,7 @@ object NetworkDataHolder {
     fun loadArticleContent(articleId: String): LiveData<String?> {
         val content = MutableLiveData<String?>(null)
         GlobalScope.launch {
-            delay(1500)
+            //delay(1500)
             val s = articlesContent[articleId.toInt() % 6]
             content.postValue(s)
         }
