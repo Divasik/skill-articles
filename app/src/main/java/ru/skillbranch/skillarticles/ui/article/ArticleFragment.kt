@@ -7,12 +7,12 @@ import android.os.Bundle
 import android.view.Menu
 import android.view.MenuItem
 import android.view.WindowManager
-import androidx.annotation.VisibleForTesting
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.appcompat.widget.SearchView
-import androidx.core.content.ContextCompat.getColor
+import androidx.core.view.isVisible
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.navArgs
+import androidx.recyclerview.widget.LinearLayoutManager
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.resource.bitmap.CenterCrop
 import com.bumptech.glide.load.resource.bitmap.RoundedCorners
@@ -26,10 +26,7 @@ import kotlinx.android.synthetic.main.layout_submenu.view.*
 import kotlinx.android.synthetic.main.search_view_layout.*
 import ru.skillbranch.skillarticles.R
 import ru.skillbranch.skillarticles.data.repositories.MarkdownElement
-import ru.skillbranch.skillarticles.extensions.dpToIntPx
-import ru.skillbranch.skillarticles.extensions.format
-import ru.skillbranch.skillarticles.extensions.hideKeyboard
-import ru.skillbranch.skillarticles.extensions.setMarginOptionally
+import ru.skillbranch.skillarticles.extensions.*
 import ru.skillbranch.skillarticles.ui.base.*
 import ru.skillbranch.skillarticles.ui.delegates.RenderProp
 import ru.skillbranch.skillarticles.viewmodels.article.ArticleState
@@ -46,6 +43,15 @@ class ArticleFragment : BaseFragment<ArticleViewModel>(), IArticleView {
                 owner = this,
                 params = args.articleId
         )
+    }
+
+    private val commentsAdapter by lazy {
+        CommentsAdapter {
+            viewModel.handleReplyTo(it.slug, it.user.name)
+            et_comment.requestFocus()
+            scroll.smoothScrollTo(0, wrap_comments.top)
+            et_comment.context.showKeyboard(et_comment)
+        }
     }
 
     override val layout: Int = R.layout.fragment_article
@@ -107,8 +113,28 @@ class ArticleFragment : BaseFragment<ArticleViewModel>(), IArticleView {
 
         et_comment.setOnEditorActionListener { v, _, _ ->
             root.hideKeyboard(v)
-            viewModel.handleSendComment()
+            viewModel.handleSendComment(v.text.toString())
             true
+        }
+
+        et_comment.setOnFocusChangeListener { v, hasFocus ->
+            viewModel.handleCommentFocus(false)
+        }
+
+        wrap_comments.setEndIconOnClickListener {
+            it.context.hideKeyboard(it)
+            viewModel.handleClearComment()
+            et_comment.text = null
+            et_comment.clearFocus()
+        }
+
+        with(rv_comments) {
+            layoutManager = LinearLayoutManager(requireContext())
+            adapter = commentsAdapter
+        }
+
+        viewModel.observeList(viewLifecycleOwner) {
+            commentsAdapter.submitList(it)
         }
     }
 
@@ -223,7 +249,6 @@ class ArticleFragment : BaseFragment<ArticleViewModel>(), IArticleView {
         var searchQuery: String? = null
 
         private var isLoadingContent by RenderProp(true)
-
         private var isLike: Boolean by RenderProp(false) { bottombar.btn_like.isChecked = it }
         private var isBookmark: Boolean by RenderProp(false) { bottombar.btn_bookmark.isChecked = it }
         private var isShowMenu: Boolean by RenderProp(false) {
@@ -262,6 +287,22 @@ class ArticleFragment : BaseFragment<ArticleViewModel>(), IArticleView {
             tv_text_content.setContent(it)
             if(it.isNotEmpty()) {
                 setupCopyListener()
+            }
+        }
+
+        private var answerTo by RenderProp("Comment") {
+            wrap_comments.hint = it
+        }
+        private var isShowBottombar by RenderProp(true) {
+            if(it) bottombar.show() else bottombar.hide()
+            if(submenu.isOpen) submenu.isVisible = it
+        }
+
+        private var comment by RenderProp("") {
+            if(it.isNotEmpty()) {
+                et_comment.setText(it)
+            } else {
+                et_comment.text = null
             }
         }
 
@@ -313,6 +354,10 @@ class ArticleFragment : BaseFragment<ArticleViewModel>(), IArticleView {
             searchQuery = data.searchQuery
             searchResults = data.searchResults
             searchPosition = data.searchPosition
+
+            answerTo = data.answerTo ?: "Comment"
+            isShowBottombar = data.showBottomBar
+            comment = data.comment ?: ""
         }
 
         override fun saveUi(outState: Bundle) {
