@@ -77,7 +77,7 @@ class ArticleItemView constructor(
         addView(iv_poster)
 
         iv_category = ImageView(context).apply {
-            id = R.id.tv_author
+            id = R.id.iv_category
             layoutParams = LayoutParams(categorySize, categorySize)
         }
         addView(iv_category)
@@ -90,7 +90,7 @@ class ArticleItemView constructor(
         addView(tv_description)
 
         iv_likes = ImageView(context).apply {
-            id = R.id.tv_author
+            id = R.id.iv_likes
             layoutParams = LayoutParams(iconSize, iconSize)
             imageTintList = ColorStateList.valueOf(grayColor)
             setImageResource(R.drawable.ic_favorite_black_24dp)
@@ -289,6 +289,7 @@ class ArticleItemView constructor(
         tv_comments_count.text = "${item.commentCount}"
         tv_read_duration.text = "${item.readDuration} min read"
         iv_bookmark.isChecked = item.isBookmark
-        iv_bookmark.setOnClickListener { listener.invoke(item, item.isBookmark) }
+        iv_bookmark.setOnClickListener { listener.invoke(item, true) }
+        this.setOnClickListener { listener.invoke(item, false) }
     }
 }
