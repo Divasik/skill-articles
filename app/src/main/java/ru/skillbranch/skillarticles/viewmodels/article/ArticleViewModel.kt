@@ -1,19 +1,20 @@
 package ru.skillbranch.skillarticles.viewmodels.article
 
+import androidx.annotation.VisibleForTesting
 import androidx.lifecycle.*
 import androidx.paging.LivePagedListBuilder
 import androidx.paging.PagedList
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import ru.skillbranch.skillarticles.data.models.ArticleData
-import ru.skillbranch.skillarticles.data.models.ArticlePersonalInfo
 import ru.skillbranch.skillarticles.data.models.CommentItemData
-import ru.skillbranch.skillarticles.data.repositories.*
+import ru.skillbranch.skillarticles.data.repositories.ArticleRepository
+import ru.skillbranch.skillarticles.data.repositories.CommentsDataFactory
+import ru.skillbranch.skillarticles.data.repositories.MarkdownElement
+import ru.skillbranch.skillarticles.data.repositories.clearContent
 import ru.skillbranch.skillarticles.extensions.data.toAppSettings
-import ru.skillbranch.skillarticles.extensions.data.toArticlePersonalInfo
-import ru.skillbranch.skillarticles.extensions.format
 import ru.skillbranch.skillarticles.extensions.indexesOf
+import ru.skillbranch.skillarticles.extensions.shortFormat
 import ru.skillbranch.skillarticles.viewmodels.base.BaseViewModel
 import ru.skillbranch.skillarticles.viewmodels.base.IViewModelState
 import ru.skillbranch.skillarticles.viewmodels.base.NavigationCommand
@@ -33,106 +34,92 @@ class ArticleViewModel(
                 .setPageSize(5)
                 .build()
     }
-    private val listData: LiveData<PagedList<CommentItemData>> = Transformations.switchMap(getArticleData()) {
-        buildPagedList(repository.allComments(articleId, it?.commentCount?:0))
-    }
+
+    @VisibleForTesting(otherwise = VisibleForTesting.PRIVATE)
+    val listData: LiveData<PagedList<CommentItemData>> =
+            Transformations.switchMap(repository.findArticleCommentCount(articleId)) {
+                buildPagedList(repository.loadAllComments(articleId, it))
+            }
 
     init {
-        subscribeOnDataSource(getArticleData()) { article, state ->
-            article ?: return@subscribeOnDataSource null
+        // subscribe on mutable data
+        subscribeOnDataSource(repository.findArticle(articleId)) { a, state ->
+            if(a.content == null) fetchContent()
             state.copy(
-                shareLink = article.shareLink,
-                title = article.title,
-                category = article.category,
-                categoryIcon = article.categoryIcon,
-                date = article.date.format(),
-                author = article.author
+                    shareLink = a.shareLink,
+                    title = a.title,
+                    category = a.category.title,
+                    categoryIcon = a.category.icon,
+                    date = a.date.shortFormat(),
+                    author = a.author,
+                    isBookmark = a.isBookmark,
+                    isLike = a.isLike,
+                    content = a.content ?: emptyList(),
+                    isLoadingContent = a.content == null
             )
         }
 
-        subscribeOnDataSource(getArticleContent()) { content, state ->
-            content ?: return@subscribeOnDataSource null
+        subscribeOnDataSource(repository.getAppSettings()) { s, state ->
             state.copy(
-                isLoadingContent = false,
-                isLoadingReviews = false,
-                content = content
+                    isDarkMode = s.isDarkMode,
+                    isBigText = s.isBigText
             )
         }
 
-        subscribeOnDataSource(getArticlePersonalInfo()) { info, state ->
-            info ?: return@subscribeOnDataSource null
-            state.copy(
-                isBookmark = info.isBookmark,
-                isLike = info.isLike
-            )
-        }
-
-        subscribeOnDataSource(repository.getAppSettings()) { settings, state ->
-            state.copy(
-                isDarkMode = settings.isDarkMode,
-                isBigText = settings.isBigText
-            )
-        }
-
-        subscribeOnDataSource(repository.isAuth()) { isAuth, state ->
-            state.copy(isAuth = isAuth)
+        subscribeOnDataSource(repository.isAuth()) { auth, state ->
+            state.copy(isAuth = auth)
         }
     }
 
-    override fun getArticleContent(): LiveData<List<MarkdownElement>?> {
-        return repository.loadArticleContent(articleId)
+    private fun fetchContent() {
+        viewModelScope.launch(Dispatchers.IO) {
+            repository.fetchArticleContent(articleId)
+        }
     }
 
-    override fun getArticleData(): LiveData<ArticleData?> {
-        return repository.getArticle(articleId)
-    }
-
-    override fun getArticlePersonalInfo(): LiveData<ArticlePersonalInfo?> {
-        return repository.loadArticlePersonalInfo(articleId)
-    }
-
+    // app settings
     override fun handleNightMode() {
         val settings = currentState.toAppSettings()
         repository.updateSettings(settings.copy(isDarkMode = !settings.isDarkMode))
     }
 
     override fun handleUpText() {
-        val settings = currentState.toAppSettings()
-        repository.updateSettings(settings.copy(isBigText = true))
+        repository.updateSettings(currentState.toAppSettings().copy(isBigText = true))
     }
 
     override fun handleDownText() {
-        val settings = currentState.toAppSettings()
-        repository.updateSettings(settings.copy(isBigText = false))
+        repository.updateSettings(currentState.toAppSettings().copy(isBigText = false))
     }
 
+    // personal article info
     override fun handleBookmark() {
-        val info = currentState.toArticlePersonalInfo()
-        repository.updateArticlePersonalInfo(info.copy(isBookmark = !info.isBookmark))
-
-        val msg = Notify.TextMessage(
-            if(info.isBookmark) "Remove from bookmarks" else "Add to bookmarks")
-        notify(msg)
+        val msg = if(!currentState.isBookmark) "Add to bookmarks" else "Remove from bookmarks"
+        viewModelScope.launch(Dispatchers.IO) {
+            repository.toggleBookmark(articleId)
+            withContext(Dispatchers.Main) {
+                notify(Notify.TextMessage(msg))
+            }
+        }
     }
 
     override fun handleLike() {
-        val toggleLike = {
-            val info = currentState.toArticlePersonalInfo()
-            repository.updateArticlePersonalInfo(info.copy(isLike = !info.isLike))
-        }
-
-        toggleLike()
-
-        val msg = if(currentState.isLike) Notify.TextMessage("Mark is liked")
+        val isLiked = currentState.isLike
+        val msg = if(!isLiked) Notify.TextMessage("Mark is liked")
         else {
             Notify.ActionMessage(
-                "Don`t like it anymore",
-                "No, still like it",
-                toggleLike
-            )
+                    "Don't like it anymore",
+                    "No, still like it"
+                    // handler function, if press "No, still like it" on snackbar, then toggle again
+            ) { handleLike() }
         }
-
-        notify(msg)
+        viewModelScope.launch(Dispatchers.IO) {
+            repository.toggleLike(articleId)
+            if(isLiked) repository.decrementLike(articleId)
+            else repository.incrementLike(articleId)
+            withContext(Dispatchers.Main) {
+                notify(msg)
+            }
+        }
     }
 
     override fun handleShare() {
@@ -178,7 +165,7 @@ class ArticleViewModel(
             return
         }
         viewModelScope.launch {
-            repository.sendComment(articleId, comment, currentState.answerToSlug)
+            repository.sendMessage(articleId, comment, currentState.answerToSlug)
             withContext(Dispatchers.Main) {
                 updateState { it.copy(answerTo = null, answerToSlug = null, comment = null) }
             }
