@@ -5,6 +5,7 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.preference.PreferenceManager
 import ru.skillbranch.skillarticles.App
+import ru.skillbranch.skillarticles.data.delegates.PrefDelegate
 import ru.skillbranch.skillarticles.data.models.AppSettings
 
 object PrefManager {
@@ -13,15 +14,16 @@ object PrefManager {
         PreferenceManager.getDefaultSharedPreferences(App.applicationContext())
     }
 
+    private var isDarkMode by PrefDelegate(false)
+    private var isBigText by PrefDelegate(false)
+    private var isAuth by PrefDelegate(false)
+
     private val appSettings = MutableLiveData<AppSettings>()
-    private val isAuth = MutableLiveData<Boolean>()
+    private val auth = MutableLiveData<Boolean>()
 
     init {
-        val isDarkMode = preferences.getBoolean("darkMode", false)
-        val isBigText = preferences.getBoolean("bigText", false)
-        appSettings.value = AppSettings(isDarkMode, isBigText)
-
-        isAuth.value = preferences.getBoolean("auth", false)
+        appSettings.value = AppSettings(isDarkMode!!, isBigText!!)
+        auth.value = isAuth!!
     }
 
     fun clearAll() {
@@ -31,20 +33,16 @@ object PrefManager {
     fun getAppSettings(): LiveData<AppSettings> = appSettings
 
     fun setAppSettings(sett: AppSettings) {
-        preferences.edit()
-                .putBoolean("darkMode", sett.isDarkMode)
-                .putBoolean("bigText", sett.isBigText)
-                .apply()
+        isDarkMode = sett.isDarkMode
+        isBigText = sett.isBigText
         appSettings.value = sett
     }
 
-    fun isAuth(): MutableLiveData<Boolean> = isAuth
+    fun isAuth(): MutableLiveData<Boolean> = auth
 
     fun setAuth(auth: Boolean) {
-        preferences.edit()
-                .putBoolean("auth", auth)
-                .apply()
-        isAuth.value = auth
+        isAuth = auth
+        this.auth.value = auth
     }
 
 }

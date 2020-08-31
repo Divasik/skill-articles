@@ -17,3 +17,10 @@ class MarkdownConverter{
     @TypeConverter
     fun toMarkdown(content: String?): List<MarkdownElement>? = content?.let { MarkdownParser.parse(it) }
 }
+
+class TagsConverter {
+    @TypeConverter
+    fun toList(tags: String?): List<String> {
+        return tags?.split(",") ?: emptyList()
+    }
+}

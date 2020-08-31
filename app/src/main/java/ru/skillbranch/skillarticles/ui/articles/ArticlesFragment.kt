@@ -46,7 +46,7 @@ class ArticlesFragment : BaseFragment<ArticlesViewModel>() {
                 )
         )
 
-        /*addMenuItem(
+        addMenuItem(
                 MenuItemHolder(
                         "Filter",
                         R.id.action_filter,
@@ -59,7 +59,7 @@ class ArticlesFragment : BaseFragment<ArticlesViewModel>() {
                     )
                     viewModel.navigate(NavigationCommand.To(action.actionId, action.arguments))
                 }
-        )*/
+        )
     }
 
     private val articlesAdapter = ArticlesAdapter { item, isToggleBookmark ->

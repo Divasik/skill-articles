@@ -4,11 +4,14 @@ import android.content.ClipData
 import android.content.ClipboardManager
 import android.content.Context
 import android.os.Bundle
+import android.text.SpannableStringBuilder
 import android.view.Menu
 import android.view.MenuItem
 import android.view.WindowManager
+import android.widget.TextView
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.appcompat.widget.SearchView
+import androidx.core.text.inSpans
 import androidx.core.view.isVisible
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.navArgs
@@ -28,6 +31,8 @@ import ru.skillbranch.skillarticles.R
 import ru.skillbranch.skillarticles.data.repositories.MarkdownElement
 import ru.skillbranch.skillarticles.extensions.*
 import ru.skillbranch.skillarticles.ui.base.*
+import ru.skillbranch.skillarticles.ui.custom.spans.IconLinkSpan
+import ru.skillbranch.skillarticles.ui.custom.spans.InlineCodeSpan
 import ru.skillbranch.skillarticles.ui.delegates.RenderProp
 import ru.skillbranch.skillarticles.viewmodels.article.ArticleState
 import ru.skillbranch.skillarticles.viewmodels.article.ArticleViewModel
@@ -37,6 +42,17 @@ import ru.skillbranch.skillarticles.viewmodels.base.ViewModelFactory
 class ArticleFragment : BaseFragment<ArticleViewModel>(), IArticleView {
 
     private val args: ArticleFragmentArgs by navArgs()
+
+    private val colorPrimary by lazy { root.attrValue(R.attr.colorPrimary) }
+    private val colorSecondary by lazy { root.attrValue(R.attr.colorSecondary) }
+    private val colorOnSurface by lazy { root.attrValue(R.attr.colorOnSurface) }
+    private val opacityColorSurface by lazy { root.getColor(R.color.opacity_color_surface) }
+    private val gap: Float by lazy { root.dpToPx(8) }
+    private val cornerRadius by lazy { root.dpToPx(8) }
+    private val strikeWidth by lazy { root.dpToPx(4) }
+    private val linkIcon by lazy { root.getDrawable(R.drawable.ic_link_black_24dp)!!.apply {
+        setTint(colorSecondary)
+    }}
 
     override val viewModel: ArticleViewModel by viewModels {
         ViewModelFactory(
@@ -290,6 +306,26 @@ class ArticleFragment : BaseFragment<ArticleViewModel>(), IArticleView {
             }
         }
 
+        private var source: String by RenderProp("") {
+            val spanText = SpannableStringBuilder().apply {
+                inSpans(IconLinkSpan(linkIcon, gap, colorPrimary, strikeWidth)) {
+                    append(it)
+                }
+            }
+            tv_source.setText(spanText, TextView.BufferType.SPANNABLE)
+        }
+
+        private var tags: List<String> by RenderProp(emptyList()) {
+            val spanText = SpannableStringBuilder().apply {
+                it.forEach { tag ->
+                    inSpans(InlineCodeSpan(colorOnSurface, opacityColorSurface, cornerRadius, gap)) {
+                        append(tag)
+                    }
+                }
+            }
+            tv_hashtags.setText(spanText, TextView.BufferType.SPANNABLE)
+        }
+
         private var answerTo by RenderProp("Comment") {
             wrap_comments.hint = it
         }
@@ -358,6 +394,9 @@ class ArticleFragment : BaseFragment<ArticleViewModel>(), IArticleView {
             answerTo = data.answerTo ?: "Comment"
             isShowBottombar = data.showBottomBar
             comment = data.comment ?: ""
+
+            source = data.source ?: ""
+            tags = data.tags
         }
 
         override fun saveUi(outState: Bundle) {
