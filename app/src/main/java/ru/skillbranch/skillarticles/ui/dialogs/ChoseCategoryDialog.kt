@@ -99,6 +99,11 @@ class CategoriesAdapter : RecyclerView.Adapter<CategoriesAdapter.CatVH>() {
             ch_select.setOnClickListener {
                 listener(item, ch_select.isChecked)
             }
+
+            itemView.setOnClickListener {
+                ch_select.isChecked = !ch_select.isChecked
+                listener(item, ch_select.isChecked)
+            }
         }
 
     }
