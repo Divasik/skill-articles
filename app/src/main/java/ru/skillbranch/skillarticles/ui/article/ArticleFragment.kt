@@ -5,6 +5,8 @@ import android.content.ClipboardManager
 import android.content.Context
 import android.os.Bundle
 import android.text.SpannableStringBuilder
+import android.text.Spanned
+import android.text.style.URLSpan
 import android.view.Menu
 import android.view.MenuItem
 import android.view.WindowManager
@@ -307,10 +309,12 @@ class ArticleFragment : BaseFragment<ArticleViewModel>(), IArticleView {
         }
 
         private var source: String by RenderProp("") {
+            val label = "Article source"
             val spanText = SpannableStringBuilder().apply {
                 inSpans(IconLinkSpan(linkIcon, gap, colorPrimary, strikeWidth)) {
-                    append(it)
+                    append(label)
                 }
+                setSpan(URLSpan(it), 0, label.length, Spanned.SPAN_INCLUSIVE_EXCLUSIVE)
             }
             tv_source.setText(spanText, TextView.BufferType.SPANNABLE)
         }
@@ -321,6 +325,7 @@ class ArticleFragment : BaseFragment<ArticleViewModel>(), IArticleView {
                     inSpans(InlineCodeSpan(colorOnSurface, opacityColorSurface, cornerRadius, gap)) {
                         append(tag)
                     }
+                    append(" ")
                 }
             }
             tv_hashtags.setText(spanText, TextView.BufferType.SPANNABLE)
