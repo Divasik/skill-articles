@@ -22,8 +22,8 @@ object PrefManager {
     private val auth = MutableLiveData<Boolean>()
 
     init {
-        appSettings.value = AppSettings(isDarkMode!!, isBigText!!)
-        auth.value = isAuth!!
+        appSettings.postValue(AppSettings(isDarkMode!!, isBigText!!))
+        auth.postValue(isAuth!!)
     }
 
     fun clearAll() {

@@ -311,10 +311,12 @@ class ArticleFragment : BaseFragment<ArticleViewModel>(), IArticleView {
         private var source: String by RenderProp("") {
             val label = "Article source"
             val spanText = SpannableStringBuilder().apply {
-                inSpans(IconLinkSpan(linkIcon, gap, colorPrimary, strikeWidth)) {
+                inSpans(
+                        IconLinkSpan(linkIcon, gap, colorPrimary, strikeWidth),
+                        URLSpan(it)
+                ) {
                     append(label)
                 }
-                setSpan(URLSpan(it), 0, label.length, Spanned.SPAN_INCLUSIVE_EXCLUSIVE)
             }
             tv_source.setText(spanText, TextView.BufferType.SPANNABLE)
         }
