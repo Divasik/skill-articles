@@ -18,9 +18,7 @@ class MarkdownConverter{
     fun toMarkdown(content: String?): List<MarkdownElement>? = content?.let { MarkdownParser.parse(it) }
 }
 
-class TagsConverter {
+class ListConverter {
     @TypeConverter
-    fun toList(tags: String?): List<String> {
-        return tags?.split(",") ?: emptyList()
-    }
+    fun toList(str: String?): List<String> = str?.split(",") ?: emptyList()
 }

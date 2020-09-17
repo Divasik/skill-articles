@@ -8,6 +8,6 @@ data class User(
     val avatar: String,
     val rating:Int = 0,
     val respect:Int = 0,
-    val lastVisit: Date = Date(),
-    val contacts: Map<String, String> = mapOf()
+    val updatedAt: Date = Date(),
+    val about: String? = null
 )

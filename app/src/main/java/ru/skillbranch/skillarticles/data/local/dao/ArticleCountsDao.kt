@@ -10,7 +10,7 @@ import ru.skillbranch.skillarticles.data.local.entities.ArticleCounts
 interface ArticleCountsDao : BaseDao<ArticleCounts> {
 
     @Transaction
-    fun upsert(list: List<ArticleCounts>) {
+    suspend fun upsert(list: List<ArticleCounts>) {
         insert(list)
                 .mapIndexed { index, res -> if(res == -1L) list[index] else null }
                 .filterNotNull()
@@ -32,23 +32,39 @@ interface ArticleCountsDao : BaseDao<ArticleCounts> {
         UPDATE article_counts SET likes = likes+1, updated_at = CURRENT_TIMESTAMP
         WHERE article_id = :article_id
     """)
-    fun incrementLike(article_id: String): Int
+    suspend fun incrementLike(article_id: String): Int
 
     @Query("""
         UPDATE article_counts SET likes = MAX(0, likes-1), updated_at = CURRENT_TIMESTAMP
         WHERE article_id = :article_id
     """)
-    fun decrementLike(article_id: String): Int
+    suspend fun decrementLike(article_id: String): Int
 
     @Query("""
         UPDATE article_counts SET comments = comments+1, updated_at = CURRENT_TIMESTAMP
         WHERE article_id = :article_id
     """)
-    fun incrementCommentsCount(article_id: String): Int
+    suspend fun incrementCommentsCount(article_id: String): Int
 
     @Query("""
         SELECT comments FROM article_counts
         WHERE article_id = :article_id
     """)
     fun getCommentsCount(article_id: String): LiveData<Int>
+
+    @Query("""
+        UPDATE article_counts SET comments = :comments
+        WHERE article_id = :articleId
+    """)
+    suspend fun updateCommentsCount(articleId: String, comments: Int)
+
+    @Query("""
+        UPDATE article_counts SET likes = :likes
+        WHERE article_id = :articleId
+    """)
+    suspend fun updateLike(articleId: String, likes: Int)
+
+    @Query("SELECT * FROM article_counts WHERE article_id = :articleId")
+    suspend fun findArticlesCountsTest(articleId:String) : ArticleCounts
+
 }
