@@ -8,7 +8,7 @@ import java.util.*
 
 @Entity(tableName = "articles")
 data class Article(
-    @PrimaryKey()
+    @PrimaryKey
     val id: String,
     val title: String,
     val description: String,
