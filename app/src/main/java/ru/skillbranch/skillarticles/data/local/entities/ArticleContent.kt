@@ -6,13 +6,7 @@ import androidx.room.ForeignKey
 import androidx.room.PrimaryKey
 import java.util.*
 
-@Entity(tableName = "article_contents",
-foreignKeys = [ForeignKey(
-    entity = Article::class,
-    parentColumns = ["id"],
-    childColumns = ["article_id"],
-    onDelete = ForeignKey.CASCADE
-)])
+@Entity(tableName = "article_contents")
 data class ArticleContent (
     @PrimaryKey
     @ColumnInfo(name = "article_id")
