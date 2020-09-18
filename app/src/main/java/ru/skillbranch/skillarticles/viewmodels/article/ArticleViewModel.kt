@@ -120,23 +120,26 @@ class ArticleViewModel(
     }
 
     override fun handleLike() {
-        val isLiked = currentState.isLike
-        val msg = if(!isLiked) Notify.TextMessage("Mark is liked")
-        else {
-            Notify.ActionMessage(
-                    "Don't like it anymore",
-                    "No, still like it"
-                    // handler function, if press "No, still like it" on snackbar, then toggle again
-            ) { handleLike() }
-        }
         launchSafety({
             if(it is ApiError.BadRequest) {
                 notify(Notify.ErrorMessage(it.message))
             }
-        }, { notify(msg) }) {
-            val liked = repository.toggleLike(articleId)
-            if(liked) repository.decrementLike(articleId)
-            else repository.incrementLike(articleId)
+        }, null) {
+            val isLiked = repository.toggleLike(articleId)
+
+            if(isLiked) repository.incrementLike(articleId)
+            else repository.decrementLike(articleId)
+
+            val msg = if(isLiked) Notify.TextMessage("Article marked is liked")
+            else {
+                Notify.ActionMessage(
+                        "Don't like it anymore",
+                        "No, still like it"
+                        // handler function, if press "No, still like it" on snackbar, then toggle again
+                ) { handleLike() }
+            }
+
+            notify(msg)
         }
     }
 
