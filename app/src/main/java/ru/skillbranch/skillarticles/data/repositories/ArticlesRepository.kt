@@ -56,6 +56,7 @@ object ArticlesRepository : IArticlesRepository {
         this.categoriesDao = categoriesDao
         this.tagsDao = tagsDao
         this.articlePersonalDao = articlePersonalDao
+        this.articlesContentDao = articlesContentDao
     }
 
     override suspend fun loadArticlesFromNetwork(start: String?, size: Int): Int {
