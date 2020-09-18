@@ -131,8 +131,11 @@ object ArticleRepository : IArticleRepository {
             val res = network.incrementLike(articleId, preferences.accessToken)
             articleCountsDao.updateLike(articleId, res.likeCount)
         } catch (e: Exception) {
-            articleCountsDao.incrementLike(articleId)
-            if(e !is NoNetworkError) throw e
+            if(e is NoNetworkError) {
+                articleCountsDao.incrementLike(articleId)
+                return
+            }
+            throw e
         }
     }
 
@@ -145,8 +148,11 @@ object ArticleRepository : IArticleRepository {
             val res = network.decrementLike(articleId, preferences.accessToken)
             articleCountsDao.updateLike(articleId, res.likeCount)
         } catch (e: Exception) {
-            articleCountsDao.decrementLike(articleId)
-            if(e !is NoNetworkError) throw e
+            if(e is NoNetworkError) {
+                articleCountsDao.decrementLike(articleId)
+                return
+            }
+            throw e
         }
     }
 
