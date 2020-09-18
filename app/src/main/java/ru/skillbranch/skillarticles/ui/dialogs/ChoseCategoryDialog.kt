@@ -22,7 +22,7 @@ class ChoseCategoryDialog : DialogFragment() {
 
     private val viewModel: ArticlesViewModel by activityViewModels()
     private val args: ChoseCategoryDialogArgs by navArgs()
-    lateinit var adapter: CategoriesAdapter
+    lateinit var adapter: CategoryAdapter
 
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
         val categories = args.categories.toList()
@@ -32,7 +32,7 @@ class ChoseCategoryDialog : DialogFragment() {
             else -> args.selectedCategories.toList()
         }
 
-        adapter = CategoriesAdapter().apply {
+        adapter = CategoryAdapter().apply {
             submitList(categories, selIds.toMutableList())
         }
 
@@ -44,7 +44,7 @@ class ChoseCategoryDialog : DialogFragment() {
                 .setView(customView)
                 .setTitle("Chose category")
                 .setPositiveButton("Apply") { _, _ ->
-                    viewModel.applyCategories((rv.adapter as CategoriesAdapter).selIds)
+                    viewModel.applyCategories((rv.adapter as CategoryAdapter).selIds)
                 }
                 .setNegativeButton("Reset") { _, _ ->
                     viewModel.applyCategories(emptyList())
@@ -59,52 +59,3 @@ class ChoseCategoryDialog : DialogFragment() {
     }
 }
 
-class CategoriesAdapter : RecyclerView.Adapter<CategoriesAdapter.CatVH>() {
-
-    private var items: List<CategoryData> = emptyList()
-    var selIds: MutableList<String> = mutableListOf()
-
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): CatVH {
-        return CatVH(LayoutInflater.from(parent.context).inflate(R.layout.dialog_categories_item, parent, false))
-    }
-
-    override fun getItemCount(): Int = items.size
-
-    override fun onBindViewHolder(holder: CatVH, position: Int) {
-        holder.bind(items[position]) { item, isChecked ->
-            if(isChecked) selIds.add(item.categoryId)
-            else selIds.remove(item.categoryId)
-        }
-    }
-
-    fun submitList(list: List<CategoryData>, selectedList: MutableList<String>) {
-        items = list
-        selIds = selectedList
-        notifyDataSetChanged()
-    }
-
-    inner class CatVH(override val containerView: View) : RecyclerView.ViewHolder(containerView), LayoutContainer {
-
-        fun bind(item: CategoryData, listener: (CategoryData, Boolean) -> Unit) {
-            ch_select.isChecked = selIds.contains(item.categoryId)
-
-            Glide.with(itemView)
-                    .load(item.icon)
-                    .into(iv_icon)
-
-            tv_category.text = item.title
-
-            tv_count.text = item.articlesCount.toString()
-
-            ch_select.setOnClickListener {
-                listener(item, ch_select.isChecked)
-            }
-
-            itemView.setOnClickListener {
-                ch_select.isChecked = !ch_select.isChecked
-                listener(item, ch_select.isChecked)
-            }
-        }
-
-    }
-}

@@ -1,11 +1,9 @@
 package ru.skillbranch.skillarticles.ui.article
 
-import android.view.View
 import android.view.ViewGroup
 import androidx.paging.PagedListAdapter
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
-import ru.skillbranch.skillarticles.data.models.CommentItemData
 import ru.skillbranch.skillarticles.data.remote.res.CommentRes
 import ru.skillbranch.skillarticles.ui.custom.CommentItemView
 
