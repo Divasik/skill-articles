@@ -2,9 +2,9 @@ package ru.skillbranch.skillarticles.data.remote
 
 import retrofit2.Call
 import retrofit2.http.*
-import ru.skillbranch.skillarticles.data.local.entities.ArticleCounts
 import ru.skillbranch.skillarticles.data.remote.req.LoginReq
 import ru.skillbranch.skillarticles.data.remote.req.MessageReq
+import ru.skillbranch.skillarticles.data.remote.req.RefreshReq
 import ru.skillbranch.skillarticles.data.remote.res.*
 
 interface RestService {
@@ -37,6 +37,9 @@ interface RestService {
 
     @POST("auth/login")
     suspend fun login(@Body loginReq: LoginReq): AuthRes
+
+    @POST("auth/refresh")
+    suspend fun refresh(@Body refreshReq: RefreshReq): RefreshRes
 
     @POST("articles/{article}/decrementLikes")
     suspend fun decrementLike(

@@ -7,3 +7,8 @@ data class AuthRes(
     val refreshToken:String,
     val accessToken:String
 )
+
+data class RefreshRes(
+    val refreshToken:String,
+    val accessToken:String
+)
