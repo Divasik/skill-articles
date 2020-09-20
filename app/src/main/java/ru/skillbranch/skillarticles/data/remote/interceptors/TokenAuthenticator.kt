@@ -1,7 +1,6 @@
 package ru.skillbranch.skillarticles.data.remote.interceptors
 
 import android.util.Log
-import kotlinx.coroutines.*
 import okhttp3.Authenticator
 import okhttp3.Request
 import okhttp3.Response
@@ -17,18 +16,18 @@ class TokenAuthenticator : Authenticator {
 
     override fun authenticate(route: Route?, response: Response): Request? {
         if(response.code == 401) {
-            runBlocking {
-                return@runBlocking try {
-                    val refreshRes = network.refresh(RefreshReq(pref.refreshToken))
-                    pref.accessToken = "Bearer ${refreshRes.accessToken}"
-                    pref.refreshToken = refreshRes.refreshToken
-                    response.request.newBuilder()
-                            .header("Authorization", pref.accessToken)
-                            .build()
-                } catch (e: Exception) {
-                    Log.d("TokenAuthenticator", e.toString())
-                    null
+            try {
+                val refresh = network.refresh(RefreshReq(pref.refreshToken)).execute()
+                val res = refresh.body()!!
+                with (pref) {
+                    accessToken = "Bearer ${res.accessToken}"
+                    refreshToken = res.refreshToken
                 }
+                return response.request.newBuilder()
+                        .header("Authorization", pref.accessToken)
+                        .build()
+            } catch (e: Exception) {
+                Log.d("TokenAuthenticator", e.toString())
             }
         }
         return null

@@ -39,7 +39,7 @@ interface RestService {
     suspend fun login(@Body loginReq: LoginReq): AuthRes
 
     @POST("auth/refresh")
-    suspend fun refresh(@Body refreshReq: RefreshReq): RefreshRes
+    fun refresh(@Body refreshReq: RefreshReq): Call<RefreshRes>
 
     @POST("articles/{article}/decrementLikes")
     suspend fun decrementLike(
