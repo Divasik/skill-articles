@@ -1,12 +1,7 @@
 package ru.skillbranch.skillarticles.ui.auth
 
-import android.os.Bundle
 import android.text.Spannable
-import androidx.fragment.app.Fragment
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
-import android.widget.TextView
+import androidx.core.os.bundleOf
 import androidx.core.text.set
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.navArgs
@@ -34,8 +29,15 @@ class AuthFragment : BaseFragment<AuthViewModel>() {
         }
 
         val color = root.attrValue(R.attr.colorPrimary)
+        (tv_register.text as Spannable).let { it[0..it.length] = UnderlineSpan(color)}
         (tv_access_code.text as Spannable).let { it[0..it.length] = UnderlineSpan(color)}
         (tv_privacy.text as Spannable).let { it[0..it.length] = UnderlineSpan(color)}
+
+        tv_register.setOnClickListener {
+            viewModel.navigate(NavigationCommand.To(
+                    R.id.page_registration,
+                    bundleOf("private_destination" to args.privateDestination)))
+        }
 
         tv_privacy.setOnClickListener {
             viewModel.navigate(NavigationCommand.To(R.id.page_privacy_policy))

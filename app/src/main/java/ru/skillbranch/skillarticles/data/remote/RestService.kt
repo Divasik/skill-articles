@@ -3,10 +3,7 @@ package ru.skillbranch.skillarticles.data.remote
 import okhttp3.MultipartBody
 import retrofit2.Call
 import retrofit2.http.*
-import ru.skillbranch.skillarticles.data.remote.req.LoginReq
-import ru.skillbranch.skillarticles.data.remote.req.MessageReq
-import ru.skillbranch.skillarticles.data.remote.req.EditProfileReq
-import ru.skillbranch.skillarticles.data.remote.req.RefreshReq
+import ru.skillbranch.skillarticles.data.remote.req.*
 import ru.skillbranch.skillarticles.data.remote.res.*
 
 interface RestService {
@@ -36,6 +33,9 @@ interface RestService {
 
     @GET("articles/{article}/counts")
     suspend fun loadArticleCounts(@Path("article") articleId: String): ArticleCountsRes
+
+    @POST("auth/register")
+    suspend fun register(@Body registerReq: RegisterReq): AuthRes
 
     @POST("auth/login")
     suspend fun login(@Body loginReq: LoginReq): AuthRes

@@ -97,6 +97,16 @@
                 android:defaultValue="-1" />
         </fragment>
         <fragment
+            android:id="@+id/page_registration"
+            android:name="ru.skillbranch.skillarticles.ui.auth.RegistrationFragment"
+            android:label="@string/title_registration"
+            tools:layout="@layout/fragment_registration" >
+            <argument
+                android:name="private_destination"
+                app:argType="integer"
+                android:defaultValue="-1" />
+        </fragment>
+        <fragment
             android:id="@+id/page_privacy_policy"
             android:name="ru.skillbranch.skillarticles.ui.auth.PrivacyPolicyFragment"
             android:label="@string/title_privacy_policy"
