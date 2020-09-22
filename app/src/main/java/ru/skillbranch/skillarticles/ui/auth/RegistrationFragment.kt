@@ -33,36 +33,13 @@ class RegistrationFragment() : BaseFragment<AuthViewModel>() {
 
     override fun setupViews() {
         btn_register.setOnClickListener {
-            register()
+            viewModel.handleRegister(
+                    et_name.text.toString(),
+                    et_login.text.toString(),
+                    et_password.text.toString(),
+                    if(args.privateDestination == -1) null else args.privateDestination
+            )
         }
     }
 
-    private fun register() {
-        val name = et_name.text.toString()
-        if(name.length < 3) {
-            et_name.setError("The name must be at least 3 characters long and contain only letters and numbers and can also contain the characters \"-\" and \"_\"")
-            return
-        }
-
-        val login = et_login.text.toString()
-        val emailRegex = "^[A-Za-z](.*)([@]{1})(.{1,})(\\.)(.{1,})".toRegex()
-        if(!emailRegex.matches(login)) {
-            et_login.setError("Incorrect Email entered")
-            return
-        }
-
-        val pass = et_password.text.toString()
-        val passRegex = "^[a-zA-Z0-9]{8,}$".toRegex()
-        if(!passRegex.matches(pass)) {
-            et_password.setError("Password must be at least 8 characters long and contain only letters and numbers")
-            return
-        }
-
-        viewModel.handleRegister(
-                name,
-                login,
-                pass,
-                if(args.privateDestination == -1) null else args.privateDestination
-        )
-    }
 }
