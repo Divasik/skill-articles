@@ -7,8 +7,10 @@ import android.view.View
 import android.view.View.inflate
 import android.view.ViewGroup
 import androidx.appcompat.app.AlertDialog
+import androidx.core.os.bundleOf
 import androidx.fragment.app.DialogFragment
 import androidx.fragment.app.activityViewModels
+import androidx.fragment.app.setFragmentResult
 import androidx.navigation.fragment.navArgs
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
@@ -20,7 +22,11 @@ import ru.skillbranch.skillarticles.viewmodels.articles.ArticlesViewModel
 
 class ChoseCategoryDialog : DialogFragment() {
 
-    private val viewModel: ArticlesViewModel by activityViewModels()
+    companion object {
+        const val CHOSE_CATEGORY_KEY = "CHOSE_CATEGORY_KEY"
+        const val SELECTED_CATEGORIES = "SELECTED_CATEGORIES"
+    }
+
     private val args: ChoseCategoryDialogArgs by navArgs()
     lateinit var adapter: CategoryAdapter
 
@@ -44,10 +50,11 @@ class ChoseCategoryDialog : DialogFragment() {
                 .setView(customView)
                 .setTitle("Chose category")
                 .setPositiveButton("Apply") { _, _ ->
-                    viewModel.applyCategories((rv.adapter as CategoryAdapter).selIds)
+                    val selected = (rv.adapter as CategoryAdapter).selIds
+                    setFragmentResult(CHOSE_CATEGORY_KEY, bundleOf(SELECTED_CATEGORIES to selected))
                 }
                 .setNegativeButton("Reset") { _, _ ->
-                    viewModel.applyCategories(emptyList())
+                    setFragmentResult(CHOSE_CATEGORY_KEY, bundleOf(SELECTED_CATEGORIES to emptyList<String>()))
                 }
 
         return adb.create()
