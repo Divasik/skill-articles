@@ -25,6 +25,11 @@ class AuthViewModel(handle: SavedStateHandle) : BaseViewModel<AuthState>(handle,
     }
 
     override fun handleRegister(name: String, login: String, password: String, dest: Int?) {
+        if(name.isEmpty() || login.isEmpty() || password.isEmpty()) {
+            notify(Notify.ErrorMessage("Name, login, password it is required fields and not must be empty"))
+            return
+        }
+
         if(name.length < 3) {
             notify(Notify.ErrorMessage("The name must be at least 3 characters long and contain only letters and numbers and can also contain the characters \"-\" and \"_\""))
             return
