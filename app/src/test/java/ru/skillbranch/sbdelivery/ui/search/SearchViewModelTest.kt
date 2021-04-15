@@ -41,7 +41,7 @@ class SearchViewModelTest {
         viewModel = SearchViewModel(useCase, mapper)
     }
 
-    /*@Test
+    @Test
     fun `when loading and init should state Loading`() {
         val hotObserve: ReplaySubject<List<DishEntity>> = ReplaySubject.create()
         whenever(useCase.getDishes()).thenReturn(hotObserve.hide().single(listOf()))
@@ -91,5 +91,5 @@ class SearchViewModelTest {
 
         verify(useCase).findDishesByName(any())
         verify(mapper).mapDtoToState(any())
-    }*/
+    }
 }
